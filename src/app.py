@@ -74,6 +74,12 @@ activities = {
         "schedule": "Tuesdays, 3:00 PM - 4:30 PM",
         "max_participants": 20,
         "participants": []
+    },
+    "sample_activity": {
+        "description": "A sample activity for testing purposes",
+        "schedule": "Saturdays, 10:00 AM - 12:00 PM",
+        "max_participants": 10,
+        "participants": []
     }
 }
 
@@ -105,3 +111,22 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/unregister")
+def unregister_from_activity(activity_name: str, participant: str):
+    """Unregister a participant from an activity"""
+    # Validate activity exists
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    # Get the specific activity
+    activity = activities[activity_name]
+
+    # Validate participant is signed up
+    if participant not in activity["participants"]:
+        raise HTTPException(status_code=404, detail=f"Participant {participant} not found in {activity_name}")
+
+    # Remove participant
+    activity["participants"].remove(participant)
+    return {"message": f"Unregistered {participant} from {activity_name}"}
